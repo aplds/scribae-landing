@@ -19,15 +19,10 @@ publication échoue. Ne pas le supprimer.
 
 ## Domaine personnalisé (doc.scribae.eu)
 
-Le fichier `CNAME` contient `doc.scribae.eu`. Pour l'utiliser :
-
-1. Chez le gestionnaire DNS de `scribae.eu`, créer un enregistrement
-   `CNAME` : nom `doc`, valeur `<compte>.github.io` (ou, pour un domaine
-   apex, des enregistrements `A` vers les IP de GitHub Pages).
-2. Dans `Settings` → `Pages` → `Custom domain`, saisir `doc.scribae.eu` et
-   cocher « Enforce HTTPS ».
-
-Si le site est hébergé ailleurs, supprimer `CNAME`.
+Le fichier `CNAME` contient `doc.scribae.eu`. Pour l'utiliser : chez le
+gestionnaire DNS de `scribae.eu`, créer un enregistrement `CNAME` (nom `doc`
+vers `<compte>.github.io`), puis `Settings` → `Pages` → `Custom domain`, et
+cocher « Enforce HTTPS ». Si le site est hébergé ailleurs, supprimer `CNAME`.
 
 ## Contenu du zip
 
@@ -46,6 +41,9 @@ régénérer ce zip : recopier `index.html`, remplacer les `[root.site.<clé>]`
 par les valeurs de la liste `site` de `main.pjs`, dé-échapper les accolades
 (\{ → {, \} → }), puis renvoyer le tout ici.
 
-Les liens (dépôt, démonstration, licence) sont ceux du `main.pjs` d'origine :
-dépôt <https://github.com/aplds/scribae>, démonstration
+Liens : dépôt <https://github.com/aplds/scribae>, démonstration
 <https://demo.scribae.eu/>.
+
+Documentation annexe relevée sur Scribae **1.6.1q** (23 septembre 2026) :
+image officielle Docker Hub `docker.io/aplds/scribae:latest`, rangement par
+fichiers, annuaire OIDC côté service.

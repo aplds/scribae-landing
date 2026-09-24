@@ -1208,9 +1208,10 @@
         <div class="step-card">
           <div class="step-card__num">OPTION 02 — VOTRE SERVEUR</div>
           <h3>Travailler à plusieurs postes</h3>
-          <p>Pour que trames et actes soient partagés par tout un service, deux voies :</p>
+          <p>Pour que trames et actes soient partagés par tout un service :</p>
           <ul>
-            <li>La pile Docker livrée (nginx, Node, MariaDB), en quelques minutes</li>
+            <li>L'image officielle <code>docker.io/aplds/scribae:latest</code> — publiée sur Docker Hub : un conteneur, une commande</li>
+            <li>Ou la pile Docker livrée (nginx, Node, MariaDB), en quelques minutes</li>
             <li>Ou la base MySQL / MariaDB que la collectivité exploite déjà</li>
             <li>Guides d'installation et d'exploitation fournis au service informatique</li>
           </ul>
@@ -1273,8 +1274,8 @@
       <span class="eyebrow">Documentation</span>
       <h1 id="docTitle">Installer et exploiter Scribae en auto-hébergement</h1>
       <p class="lead">Ce que contient la pile, comment la configurer, la démarrer, la sauvegarder, la mettre à jour et la dépanner — une page technique, écrite pour le service informatique de la collectivité.</p>
-      <p class="muted" style="font-size:.93rem">Elle rassemble, sans les remplacer, les deux documents techniques du logiciel : <code>src/server/README.md</code> (installation) et <code>src/docs/ADMINISTRATION.md</code> (exploitation et maintenance), avec leurs annexes <code>docs/VARIABLES.md</code> et <code>docs/DOCKER.md</code>. La version de référence reste celle du dépôt : en cas d'écart, c'est elle qui fait foi.</p>
-      <p class="doc__meta">Scribae 1.5.3 · notes de version jusqu'à 1.5.4a · page relevée en septembre 2026 · <a href="https://github.com/aplds/scribae" target="_blank" rel="noopener">github.com/aplds/scribae</a></p>
+      <p class="muted" style="font-size:.93rem">Elle rassemble, sans les remplacer, les documents techniques du logiciel : <code>src/server/README.md</code> (installation), <code>src/docs/ADMINISTRATION.md</code> (exploitation et maintenance), <code>src/docs/DOCKER.md</code> (image autonome), avec leurs annexes <code>docs/VARIABLES.md</code> (les variables d'environnement) et <code>docs/PERFORMANCE.md</code> (la charge mesurée). La version de référence reste celle du dépôt : en cas d'écart, c'est elle qui fait foi.</p>
+      <p class="doc__meta">Scribae 1.6.1q · version publiée le 23 septembre 2026 · page relevée en septembre 2026 · <a href="https://github.com/aplds/scribae" target="_blank" rel="noopener">github.com/aplds/scribae</a></p>
     </div>
 
     <div class="doc__layout">
@@ -1331,6 +1332,9 @@
               </tbody>
             </table>
           </div>
+          <p>Pour produire des actes réels, le <strong>service</strong> est nécessaire — et il se déploie de deux manières : la pile Compose de <code>src/server/</code> (quatre conteneurs, décrite au § 2), ou <strong>l'image autonome publiée sur Docker Hub</strong>, <code>docker.io/aplds/scribae:latest</code>, qui réunit en un seul conteneur le service, la façade et le code de l'application. Cette image se lance d'une commande, sans dépôt ni dossier à transporter (§ 10).</p>
+          <h3>Le service, avec ou sans base de données</h3>
+          <p>Le service range ses données de deux façons. Par défaut (<code>STOCKAGE=mysql</code>) dans une base <strong>MariaDB / MySQL</strong> — celle de la pile, ou celle que la collectivité exploite déjà. Ou bien dans un simple <strong>dossier</strong> (<code>STOCKAGE=fichier</code>, dossier <code>DATA_DIR</code>) : aucune base à administrer, et une sauvegarde qui se réduit à une copie de dossier — le déploiement d'un poste, d'une petite collectivité, ou d'une machine où l'on ne veut qu'un seul logiciel. Le rangement par fichiers suppose en revanche <strong>un seul service</strong> écrivant dans le dossier (§ 10).</p>
           <div class="doc-note doc-note--warn">
             <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
             <div><p><strong>La démonstration publique n'est pas un service.</strong> Tout y reste dans le navigateur du visiteur : rien n'est partagé entre collègues, rien n'est sauvegardé, et ce qui est conservé peut disparaître (navigation privée, effacement des données du site, éviction au-delà des bornes de capacité). Il n'y a pas non plus d'accès SMTP : les notifications y sont constatées « non envoyées ». Une collectivité qui produit des actes réels installe le service, ou branche la base qu'elle exploite déjà.</p></div>
@@ -1373,13 +1377,17 @@
             <p class="doc-flow__foot">Depuis la 1.5.3b, <strong>aucun fichier de l'hôte n'est monté</strong> dans ces conteneurs : la façade, le schéma et les réglages d'nginx sont <em>construits</em> dans les images. C'est ce qui met l'installation à l'abri des refus de lecture des montages (SELinux, AppArmor, NFS, espace de noms d'utilisateurs) — la panne la plus fréquente de l'ancienne pile.</p>
           </div>
           <p>Deux volumes, donc : <code>donnees</code> pour MariaDB, et la racine servie par la façade, construite dans l'image de <code>web</code>. Le service n'a pas de dossier de travail à sauvegarder — tout ce qui compte pour la collectivité est en base (§ 12).</p>
+          <div class="doc-note">
+            <svg class="icon" viewBox="0 0 24 24"><use href="#i-server"/></svg>
+            <div><p><strong>Un conteneur suffit pour un déploiement simple.</strong> La pile ci-dessus est la voie complète, base comprise. Pour un déploiement en une commande, <strong>l'image autonome</strong> — <code>docker.io/aplds/scribae:latest</code>, publiée sur Docker Hub — réunit <code>api</code>, <code>web</code> et le code de l'application dans un <strong>seul</strong> conteneur ; seule la base reste à part (§ 10).</p></div>
+          </div>
         </section>
 
         <section class="doc-sec" id="doc-prerequis">
           <h2><span class="doc-sec__n">03</span>Prérequis</h2>
           <ul class="doc-check">
             <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Un serveur</strong> (Linux conseillé) avec <strong>Docker</strong> et le plugin <code>docker compose</code>.</span></li>
-            <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Le dépôt de l'application</strong> — le dossier qui contient <code>src/</code> ; c'est le contexte de construction, et non un dossier de fichiers à monter.</span></li>
+            <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Le dépôt de l'application</strong> — le dossier qui contient <code>src/</code> ; c'est le contexte de construction, et non un dossier de fichiers à monter. <strong>Sans objet</strong> si vous partez de l'image publiée sur Docker Hub : elle porte déjà le code (§ 10).</span></li>
             <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Un nom de domaine</strong> et un reverse-proxy TLS pour la production (§ 8).</span></li>
             <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Une base MariaDB</strong> : celle de la pile, ou celle que la collectivité exploite déjà (§ 8).</span></li>
             <li><svg class="icon" viewBox="0 0 24 24"><use href="#i-check"/></svg><span><strong>Un coffre à secrets</strong> pour le fichier <code>.env</code> — il ne va ni dans le dépôt, ni dans une sauvegarde de la base.</span></li>
@@ -1393,7 +1401,7 @@
 
         <section class="doc-sec" id="doc-config">
           <h2><span class="doc-sec__n">04</span>Configurer le déploiement</h2>
-          <p>Toute la configuration tient dans un fichier <code>.env</code>, à la racine de <code>src/server/</code>, copié depuis le modèle livré.</p>
+          <p>Toute la configuration tient dans des <strong>variables d'environnement</strong>. Avec la pile Compose, elles vivent dans un fichier <code>.env</code>, à la racine de <code>src/server/</code>, copié depuis le modèle livré ; avec l'image autonome, elles se passent en options <code>-e</code> au <code>docker run</code> (§ 10) — le même jeu de variables dans les deux cas.</p>
           <pre><code>cd src/server
 cp env.example .env</code></pre>
           <h3>Générer un jeton d'API</h3>
@@ -1401,6 +1409,10 @@ cp env.example .env</code></pre>
           <pre><code>JETON=$(openssl rand -hex 32)
 echo "API_TOKEN (en clair, pour l'application) : $JETON"
 printf '%s' "$JETON" | sha256sum      # → empreinte, pour API_TOKENS</code></pre>
+          <div class="doc-note">
+            <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
+            <div><p><strong>Facultatif en mode « mot de passe ».</strong> Les jetons de déploiement (<code>API_TOKENS</code>, <code>API_TOKEN</code>) servent surtout en mode <code>demo</code>, où aucune session n'existe. En mode <code>password</code>, les <strong>clés d'API à rôles</strong> créées dans l'application les remplacent : les deux variables peuvent rester vides (voir § 5).</p></div>
+          </div>
           <h3>Les variables à renseigner</h3>
           <div class="doc-tablewrap">
             <table class="doc-table">
@@ -1462,7 +1474,13 @@ printf '%s' "$JETON" | sha256sum      # → empreinte, pour API_TOKENS</code></p
               </tbody>
             </table>
           </div>
-          <p>Une clé se présente en <code>Authorization: Bearer &lt;clé&gt;</code> ; le service n'en conserve que l'empreinte SHA-256, et sa valeur ne s'affiche qu'<strong>une fois</strong>, à la création. Elle se révoque d'un clic — le service refuse de révoquer la <strong>dernière</strong> clé d'administration (<code>409 derniere_cle_admin</code>). Enfin, pour l'authentification par l'annuaire de la collectivité (OpenID Connect), voir <em>Administration › Annuaire</em> — l'application elle-même ne livre ni second facteur, ni réinitialisation par courriel (§ 16).</p>
+          <p>Une clé se présente en <code>Authorization: Bearer &lt;clé&gt;</code> ; le service n'en conserve que l'empreinte SHA-256, et sa valeur ne s'affiche qu'<strong>une fois</strong>, à la création. Elle se révoque d'un clic — le service refuse de révoquer la <strong>dernière</strong> clé d'administration (<code>409 derniere_cle_admin</code>).</p>
+          <h3>L'annuaire de la collectivité (OpenID Connect)</h3>
+          <p>Plutôt que de tenir des comptes locaux, une collectivité peut brancher son <strong>annuaire</strong> (Keycloak, LemonLDAP::NG, Entra ID, ADFS…). Le branchement est <strong>déclaratif</strong> : émetteur, identifiant de client en <em>client public</em> (PKCE, sans secret), portées, correspondance des groupes vers les rôles, périmètre des services et de l'entité — soit par les variables <code>SCRIBA_ANNUAIRE_*</code> du <code>.env</code> (pour équiper tout un parc d'un coup), soit à l'écran <em>Administration › Annuaire</em>. <code>AUTH_MODE=oidc</code> en fait la <strong>porte ordinaire</strong> ; <code>SCRIBA_ANNUAIRE_SECONDE_PORTE=true</code> la propose <strong>en plus</strong> de la porte ordinaire. Dans les deux cas, les compte locaux restent ouverts comme porte de service.</p>
+          <div class="doc-note">
+            <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
+            <div><p><strong>Depuis la 1.6.1p, c'est le SERVICE qui parle à l'annuaire</strong>, et non le navigateur : il découvre le fournisseur, échange le code d'autorisation (avec le vérificateur PKCE), vérifie le jeton d'identité — signature comprise (JWKS, RS/PS/ES) —, écrit le compte au référentiel, puis ouvre <strong>sa</strong> session, les mêmes cookies que la connexion par mot de passe. Deux conséquences pratiques : le fournisseur <strong>n'a pas besoin d'ouvrir le CORS</strong> (c'était la cause du « Découverte impossible (<em>Failed to fetch</em>) » des versions antérieures), et un agent entré par l'annuaire <strong>lit les actes</strong> — la seconde porte est alors proposée même en mode <code>password</code>. Pour un branchement à blanc, <code>SCRIBA_ANNUAIRE_ESSAI=true</code> fait jouer un annuaire d'essai <strong>intégré</strong>, sans aucun appel réseau. L'application elle-même ne livre ni second facteur, ni réinitialisation par courriel (§ 16).</p></div>
+          </div>
         </section>
 
         <section class="doc-sec" id="doc-reglages">
@@ -1477,7 +1495,7 @@ SCRIBA_RECUEIL_OPPOSABILITE=jours</code></pre>
             <li>une valeur <strong>refusée</strong> (type, choix, borne) n'est pas appliquée, et le motif est journalisé par le service (<code>docker compose logs api</code>) et rendu par <code>GET /v1/config</code> ;</li>
             <li>le <code>.env</code> <strong>l'emporte</strong> sur l'interface à chaque démarrage, sans modifier le référentiel enregistré : retirer la variable rend la main à l'administrateur.</li>
           </ul>
-          <p>Cinquante et une variables sont disponibles. Les principales :</p>
+          <p>Plus de cent trente variables sont répertoriées — réglages de service et réglages de référentiel confondus. Les principales :</p>
           <div class="doc-tablewrap">
             <table class="doc-table">
               <thead><tr><th>Variable</th><th>Ce qu'elle pose</th></tr></thead>
@@ -1490,7 +1508,10 @@ SCRIBA_RECUEIL_OPPOSABILITE=jours</code></pre>
                 <tr><td><code>SCRIBA_RECUEIL_*</code></td><td>titre du recueil, publication automatique, opposabilité et son délai</td></tr>
                 <tr><td><code>SCRIBA_ATELIER_IPS</code></td><td>liste blanche des réseaux autorisés à ouvrir l'atelier (§ 9)</td></tr>
                 <tr><td><code>SCRIBA_SIGNATURE_*</code></td><td>le circuit électronique : transport, adresse, prestataire, niveau, points de terminaison…</td></tr>
+                <tr><td><code>SCRIBA_ANNUAIRE_*</code></td><td>l'annuaire de la collectivité (OpenID Connect) : émetteur, client, portées, correspondance des groupes → rôles, périmètre, seconde porte, points de terminaison. Aucun secret : c'est un client <strong>public</strong> (PKCE)</td></tr>
+                <tr><td><code>SCRIBA_BULLETIN_*</code></td><td>le bulletin (ou Journal) des actes : activation, titre, sous-titre, cadence de parution, jour de parution</td></tr>
                 <tr><td><code>SCRIBA_CONTROLE_LEGALITE</code>, <code>SCRIBA_ASSISTANT_*</code></td><td>la télétransmission (fonction expérimentale, éteinte par défaut) et les deux assistants</td></tr>
+                <tr><td><code>STOCKAGE</code>, <code>DATA_DIR</code></td><td>le rangement des données : <code>mysql</code> (défaut) ou <code>fichier</code>, et alors le dossier qui porte tout (§ 1)</td></tr>
               </tbody>
             </table>
           </div>
@@ -1498,8 +1519,8 @@ SCRIBA_RECUEIL_OPPOSABILITE=jours</code></pre>
             <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
             <div><p><strong>La clé du prestataire de signature ne quitte jamais le serveur.</strong> <code>SCRIBA_SIGNATURE_API_CLE</code> n'est ni transmise au navigateur, ni journalisée, ni recopiée dans le référentiel ou une sauvegarde de données. <code>GET /v1/config</code> dit seulement si elle est présente.</p></div>
           </div>
-          <p>La référence complète — portée, rôle, type, bornes et exemple pour chaque variable — est engendrée depuis le registre dans <code>docs/VARIABLES.md</code> :</p>
-          <pre><code>node src/scripts/generer-variables.mjs</code></pre>
+          <p>La référence complète — portée, rôle, type, bornes et exemple pour chaque variable — est engendrée depuis le registre dans <code>docs/VARIABLES.md</code>, par une commande qui se lance <strong>depuis la racine du dépôt</strong> :</p>
+          <pre><code>node scripts/generer-variables.mjs</code></pre>
         </section>
 
         <section class="doc-sec" id="doc-demarrer">
@@ -1588,38 +1609,60 @@ DB_PORT=3306</code></pre>
 
         <section class="doc-sec" id="doc-image">
           <h2><span class="doc-sec__n">10</span>Image autonome, et l'option statique</h2>
-          <h3>Diffuser Scribae en une seule image</h3>
-          <p>Pour installer sans transporter le dossier du dépôt, le <code>Dockerfile</code> de <code>src/server/</code> bâtit une <strong>image unique</strong> contenant le service, la façade et le code de l'application.</p>
+          <h3>L'image officielle, publiée sur Docker Hub</h3>
+          <p>Pour installer sans transporter le dossier du dépôt, Scribae est publié en <strong>image unique</strong> sur Docker Hub : <code>docker.io/aplds/scribae:latest</code>. Elle embarque tout ce que le logiciel exige — le service Node, la façade nginx et le code de l'application — et se lance d'une commande. Seule la <strong>base de données</strong> reste à part (une base MariaDB / MySQL joignable).</p>
+          <pre><code>docker pull docker.io/aplds/scribae:latest      # la dernière livraison
+docker pull docker.io/aplds/scribae:1.6.1q      # ou une version épinglée</code></pre>
+          <p>Le lancement tient en une commande :</p>
+          <pre><code>docker run -d \
+  --name scribae \
+  -p 8080:80 \
+  -e DB_HOST=adresse_de_votre_base \
+  -e DB_USER=scriba \
+  -e DB_PASSWORD='…' \
+  -e DB_NAME=scriba \
+  -e AUTH_MODE=password \
+  docker.io/aplds/scribae:latest</code></pre>
+          <p>L'application répond alors sur <code>http://&lt;serveur&gt;:8080</code>. Les variables d'environnement sont celles de la pile Compose (§ 4) : les plus utiles au démarrage sont <code>DB_HOST</code>, <code>DB_PORT</code>, <code>DB_USER</code>, <code>DB_PASSWORD</code>, <code>DB_NAME</code> (la base, obligatoires), puis <code>ADMIN_LOGIN</code> / <code>ADMIN_PASSWORD</code> (le compte créé au premier démarrage) et <code>AUTH_MODE=password</code>.</p>
+          <ul>
+            <li><code>DB_ROOT_PASSWORD</code> sert, <strong>au démarrage seulement</strong>, à remettre le compte applicatif au mot de passe de <code>DB_PASSWORD</code> et à appliquer le schéma. À omettre quand la base est administrée ailleurs.</li>
+            <li><code>AUTO_MIGRATE=true</code> applique le schéma au premier démarrage, et de nouveau quand le service se rétablit après une panne de base. Le fichier ne supprime rien.</li>
+            <li><code>COOKIE_SECURE=false</code> n'est là que pour un essai <strong>en clair</strong> sur <code>http://</code> ; en production, laisser la valeur par défaut.</li>
+            <li>Une étiquette <code>latest</code> est commode, mais une installation de service gagne à <strong>épingler</strong> une version (<code>docker.io/aplds/scribae:1.6.1q</code>) : <code>docker pull</code> reproductible, mise à jour délibérée.</li>
+          </ul>
+          <p>Pour mettre la base dans un réseau Docker dédié — ou sur un hôte du réseau local —, le geste est le même qu'avec la pile : on crée le réseau, on lance la base, puis on pointe <code>DB_HOST</code> dessus.</p>
+          <h3>Sans aucune base de données : le rangement par fichiers</h3>
+          <p>Le service sait se passer de MariaDB : <code>STOCKAGE=fichier</code> range tout dans un <strong>dossier</strong> (<code>DATA_DIR</code>), en clair, et une sauvegarde devient une copie de dossier. Avec l'image autonome, il suffit de monter un volume sur ce dossier :</p>
+          <pre><code>mkdir -p ./data
+docker run -d --name scribae --restart unless-stopped -p 8080:80 \
+  -v "$PWD/data:/data" \
+  -e STOCKAGE=fichier -e DATA_DIR=/data \
+  -e AUTH_MODE=password -e ADMIN_PASSWORD='…' \
+  docker.io/aplds/scribae:latest</code></pre>
+          <div class="doc-note">
+            <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
+            <div><p>Le rangement par fichiers suppose <strong>un seul service</strong> écrivant dans le dossier : on ne lance pas deux conteneurs sur le même <code>./data</code>, et on n'exécute pas <code>--mot-de-passe</code> ou <code>--reconcilier</code> pendant que le service tourne. Le dossier doit être <strong>accessible en écriture</strong> par le compte du conteneur, sinon le service refuse de démarrer et le dit dans ses journaux. Il survit à la recréation du conteneur, se sauvegarde en le copiant, et porte un LISEZ-MOI qui le rappelle.</p></div>
+          </div>
+          <h3>Construire l'image soi-même</h3>
+          <p>Une collectivité qui veut maîtriser sa chaîne de construction peut bâtir la même image depuis le dépôt : le <code>Dockerfile</code> de <code>src/server/</code> ne copie que <code>src/</code>, et se lance depuis la racine du dépôt.</p>
           <pre><code># depuis la racine du dépôt (le dossier qui contient src/)
-docker build -f src/server/Dockerfile -t moncompte/scribae:1.5.3 .
-docker run --rm moncompte/scribae:1.5.3 nginx -v</code></pre>
-          <p>La publier sur un registre, éventuellement pour plusieurs architectures :</p>
+docker build -f src/server/Dockerfile -t moncompte/scribae:1.6.1q .
+docker run --rm moncompte/scribae:1.6.1q nginx -v</code></pre>
+          <p>La publier sur un registre, éventuellement pour plusieurs architectures (Intel/AMD et ARM) :</p>
           <pre><code>REGISTRE=moncompte      # Docker Hub, ghcr.io/moncompte, ou un registre privé
 docker buildx build --platform linux/amd64,linux/arm64 \
   -f src/server/Dockerfile \
-  -t "$REGISTRE/scribae:1.5.3" -t "$REGISTRE/scribae:latest" --push .</code></pre>
-          <p>Puis la lancer, avec sa base dans un réseau dédié :</p>
-          <pre><code>docker network create scribae
-docker run -d --name scribae-db --network scribae --restart unless-stopped \
-  -e MARIADB_ROOT_PASSWORD='…' -e MARIADB_DATABASE=scriba \
-  -e MARIADB_USER=scriba -e MARIADB_PASSWORD='…' \
-  -v scribae-donnees:/var/lib/mysql mariadb:11
-
-docker run -d --name scribae --network scribae --restart unless-stopped -p 8080:80 \
-  -e DB_HOST=scribae-db -e DB_USER=scriba -e DB_PASSWORD='…' -e DB_NAME=scriba \
-  -e DB_ROOT_PASSWORD='…' -e AUTO_MIGRATE=true \
-  -e AUTH_MODE=password -e ADMIN_LOGIN=admin -e ADMIN_PASSWORD='…' \
-  "$REGISTRE/scribae:1.5.3"</code></pre>
-          <ul>
-            <li><code>DB_ROOT_PASSWORD</code> sert, <strong>au démarrage seulement</strong>, à remettre le compte applicatif au mot de passe de <code>DB_PASSWORD</code> et à appliquer le schéma. À omettre quand la base est administrée ailleurs.</li>
-            <li><code>COOKIE_SECURE=false</code> n'est là que pour un essai en clair sur <code>http://</code> ; en production, laisser la valeur par défaut.</li>
-            <li>Une étiquette <code>latest</code> est commode, mais une installation de service gagne à <strong>épingler</strong> une version : <code>docker pull</code> reproductible, mise à jour délibérée.</li>
-          </ul>
+  -t "$REGISTRE/scribae:1.6.1q" -t "$REGISTRE/scribae:latest" --push .</code></pre>
           <h3>Ou la voie statique (GitHub Pages)</h3>
           <p>Pour essayer, démontrer ou former sans serveur : forker le dépôt, puis <em>Settings</em> → <em>Pages</em>, source « Deploy from a branch », branche <code>main</code>, dossier <code>/</code>, <em>Save</em>. Au bout d'une minute, l'application est en ligne à <code>https://&lt;votre-compte&gt;.github.io/scribae/</code>. Il n'y a rien à compiler, et les chemins sont relatifs.</p>
           <div class="doc-note doc-note--warn">
             <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
             <div><p><strong>Ne pas supprimer le fichier <code>.nojekyll</code></strong> à la racine du dépôt : GitHub fait sinon passer la publication par Jekyll, qui interprète les accolades doubles de la documentation comme des balises de gabarit et la fait échouer. Ce fichier, même vide, désactive Jekyll.</p></div>
+          </div>
+          <p>Deux remarques avant d'activer Pages. Le fichier <code>CNAME</code> du dépôt porte l'adresse de la démonstration des auteurs (<code>demo.scribae.eu</code>) : si vous avez <strong>forké</strong>, remplacez-le par votre domaine ou supprimez-le, sans quoi votre copie réclamerait une adresse qui n'est pas la vôtre. Et le stockage du navigateur est attaché à l'<strong>adresse</strong> du site : une même copie servie sous deux adresses (celle de GitHub et la vôtre) donne deux installations distinctes — servez-la sous une seule adresse.</p>
+          <div class="doc-note">
+            <svg class="icon" viewBox="0 0 24 24"><use href="#i-lock"/></svg>
+            <div><p><strong>Travailler à plusieurs en restant sur un site statique.</strong> Les fichiers de la page peuvent rester servis par GitHub Pages et les <strong>données</strong> vivre sur un service : installez une image autonome quelque part (§ 10), puis posez, <strong>avant</strong> le chargement de <code>src/pages/host.js</code>, une ligne dans <code>index.html</code> — <code>&lt;script&gt;window.__SCRIBA_SERVICE_URL__ = "https://mon-service.exemple.fr";&lt;/script&gt;</code>. La page vise alors l'API de ce service (base partagée, dépôt, signature, publication), et <strong>tous les postes voient le même référentiel</strong>. Le service doit autoriser l'origine de la page (<code>CORS_ORIGINS</code>). Sans cette ligne, rien ne change.</p></div>
           </div>
         </section>
 
@@ -1641,6 +1684,13 @@ docker run -d --name scribae --network scribae --restart unless-stopped -p 8080:
               </tbody>
             </table>
           </div>
+          <h3>Avec l'image autonome</h3>
+          <p>Un déploiement d'un seul conteneur ne se pilote pas par Compose : les mêmes gestes passent par <code>docker</code>.</p>
+          <pre><code>docker logs -f scribae            # le journal du service : amorçage du compte, réglages refusés, motif d'un refus de connexion
+docker exec scribae node /srv/service/server.mjs --reconcilier   # aligne le compte applicatif et applique le schéma (DB_ROOT_PASSWORD requis)
+docker exec scribae node /srv/service/server.mjs --migrate       # applique le schéma seul (compte déjà en règle)
+docker exec -it scribae sh        # entrer dans le conteneur</code></pre>
+          <p>La porte de secours (<code>--mot-de-passe &lt;identifiant&gt;</code>) s'y lance de la même façon. Le conteneur fait <strong>déjà</strong> l'alignement et le schéma au démarrage lorsque <code>DB_ROOT_PASSWORD</code> lui est fourni, et depuis la 1.5.3d le service rééprouve lui-même la base : une panne réparée pendant qu'il tourne n'exige pas de le recréer.</p>
           <h3>La sonde de santé</h3>
           <p><code>GET /v1/db/health</code> est public : il rend l'état de la base et, par collection, le nombre d'enregistrements et la révision. C'est la sonde à interroger pour la supervision.</p>
           <pre><code>curl -fsS http://127.0.0.1:8080/v1/db/health | head -c 400</code></pre>
@@ -1695,6 +1745,7 @@ ORDER BY at DESC;</code></pre>
           <pre><code>gunzip -c scriba-2026-09-19.sql.gz | docker compose exec -T db \
   mariadb -u root -p"$DB_ROOT_PASSWORD" scriba</code></pre>
           <p>Politique suggérée : un dump quotidien, une rétention de 30 jours, une sauvegarde mensuelle de longue durée, et une copie hors site.</p>
+          <p><strong>En rangement par fichiers</strong> (<code>STOCKAGE=fichier</code>), il n'y a pas de base à sauvegarder : le dossier <code>DATA_DIR</code> <em>est</em> la sauvegarde. Le copier suffit — à froid de préférence —, et le restaurer, c'est le remettre en place. Le fichier <code>.env</code> (ou les options <code>-e</code> du <code>docker run</code>) reste, lui, à conserver à part dans les deux cas.</p>
         </section>
 
         <section class="doc-sec" id="doc-maj">
@@ -1707,6 +1758,7 @@ ORDER BY at DESC;</code></pre>
             <li><code>docker compose exec api node server.mjs --migrate</code> si <code>AUTO_MIGRATE=false</code> et que le schéma a changé ;</li>
             <li>vérifier <code>/v1/db/health</code> et ouvrir l'application.</li>
           </ol>
+          <p>Avec l'<strong>image autonome</strong>, la mise à jour se réduit à tirer la nouvelle étiquette et recréer le conteneur : <code>docker pull docker.io/aplds/scribae:latest</code>, puis <code>docker stop scribae</code> / <code>docker rm scribae</code> et le <code>docker run</code> du § 10. Les données ne bougent pas — elles sont dans la base, ou dans le dossier monté — et la migration s'applique seule à la reprise quand <code>AUTO_MIGRATE=true</code>. Épingler une version (<code>1.6.1q</code>) rend la mise à jour <strong>délibérée</strong> : on choisit le moment.</p>
           <p>Les mises à jour <strong>ne touchent pas</strong> aux données : la synchronisation est incrémentale, et les migrations du référentiel sont <strong>additives</strong> — un référentiel antérieur reçoit les nouveautés sans rien perdre.</p>
           <p>Une exception, mécanique et sans perte : le champ « signataire » des trames anciennes. Il était de type <em>personne</em> (une liste de noms) ; au premier démarrage, il devient de type <em>signataire</em> — la fonction d'abord, puis les personnes qui la tiennent. La valeur reste la même, seuls l'écran et la façon de la renseigner changent.</p>
           <div class="doc-note doc-note--warn">
@@ -1774,8 +1826,8 @@ ORDER BY at DESC;</code></pre>
                 </tr>
                 <tr>
                   <td>Page blanche, ou l'application ne charge pas</td>
-                  <td>conteneur <code>web</code> arrêté, ou façade construite sur un code périmé</td>
-                  <td><code>docker compose ps</code> et <code>docker compose logs web</code> ; le code est dans l'image de la façade, donc après une mise à jour : <code>docker compose up -d --build web</code></td>
+                  <td>conteneur <code>web</code> arrêté, ou façade construite sur un code périmé. Une troisième cause, corrigée en 1.6.1o : une façade antérieure servait les modules <code>.mjs</code> en <code>application/octet-stream</code> — un type que le navigateur <strong>refuse</strong> pour un module ES, ce qui casse le graphe d'imports et laisse la page blanche</td>
+                  <td><code>docker compose ps</code> et <code>docker compose logs web</code> ; le code est dans l'image de la façade, donc après une mise à jour : <code>docker compose up -d --build web</code> (ou <code>docker pull</code> puis recréer le conteneur, pour l'image autonome). Si la console dit « Expected a JavaScript module script but the server responded with a MIME type of "application/octet-stream" » pour une adresse <code>/src/…mjs</code>, c'est cette version-là : le correctif déclare <code>application/javascript</code> pour <code>.mjs</code></td>
                 </tr>
                 <tr>
                   <td>Le navigateur bloque les appels (CORS)</td>
@@ -1827,6 +1879,7 @@ ORDER BY at DESC;</code></pre>
             <li><strong>Ce n'est pas un service d'archivage.</strong> Les bornes ci-dessous sont des bornes d'exploitation courante, pas des durées de conservation. Ce que la collectivité doit conserver au titre de l'archivage — et sous quel format (paquet d'archivage, NF Z42-013) — relève de sa politique d'archivage et se traite en dehors de Scribae : d'où l'export permanent des actes, de leurs originaux signés et du journal.</li>
             <li><strong>Ce n'est pas un prestataire de signature</strong> : la signature qualifiée passe par l'outil de la collectivité, branché en API ou déposé à la main.</li>
             <li><strong>La démonstration publique n'est pas un service</strong> : rien n'y est partagé entre postes ni conservé (§ 1).</li>
+            <li><strong>Le rangement par fichiers n'est pas un mode multi-serveurs</strong> : un seul service doit écrire dans le dossier <code>DATA_DIR</code>. Pour plusieurs postes ou plusieurs instances, c'est la base MariaDB qui convient.</li>
           </ul>
           <h3>Bornes d'exploitation</h3>
           <div class="doc-tablewrap">
@@ -1843,7 +1896,7 @@ ORDER BY at DESC;</code></pre>
           </div>
           <h3>Chantiers ouverts</h3>
           <ul>
-            <li><strong>Authentification</strong> — pas de second facteur, pas de réinitialisation par courriel, pas de journal des connexions, pas de purge planifiée des sessions. En mode simulé, l'installation doit être protégée par le réseau ; l'annuaire de la collectivité (OpenID Connect) est la voie pour une identité vérifiée.</li>
+            <li><strong>Authentification</strong> — pas de second facteur, pas de réinitialisation par courriel, pas de journal des connexions, pas de purge planifiée des sessions. En mode simulé, l'installation doit être protégée par le réseau ; l'annuaire de la collectivité (OpenID Connect) est la voie pour une identité vérifiée — depuis la 1.6.1p, c'est le <strong>service</strong> qui mène la connexion à l'annuaire (§ 5).</li>
             <li><strong>Validateurs</strong> — une étape du parapheur est ouverte au rôle qui la porte (et à tout administrateur, comme recours) ; il n'existe pas de délégation nominative pour les vacances ou l'intérim, ni de rattrapage automatique en cas d'absence prolongée.</li>
             <li><strong>Verrou de rédaction souple</strong> — deux postes peuvent ouvrir le même acte : l'application avertit, elle n'exclut pas.</li>
             <li><strong>Fusion par champ</strong> — un conflit est résolu « la base gagne » ; une fusion champ par champ serait plus juste pour les objets longs.</li>
@@ -1859,8 +1912,13 @@ ORDER BY at DESC;</code></pre>
             <li><a href="https://github.com/aplds/scribae/blob/main/src/server/README.md" target="_blank" rel="noopener"><b>src/server/README.md</b></a><span>L'installation de la pile Docker : prérequis, <code>.env</code>, démarrage, TLS, sauvegardes, mise à jour, dépannage.</span></li>
             <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/ADMINISTRATION.md" target="_blank" rel="noopener"><b>src/docs/ADMINISTRATION.md</b></a><span>L'exploitation : ce qui tourne où, modèle de données, comptes et rôles, sécurité, journal d'audit, capacité, limites.</span></li>
             <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/VARIABLES.md" target="_blank" rel="noopener"><b>src/docs/VARIABLES.md</b></a><span>La référence des variables d'environnement, engendrée depuis le registre du service.</span></li>
-            <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/DOCKER.md" target="_blank" rel="noopener"><b>src/docs/DOCKER.md</b></a><span>L'image autonome : construction, registre, multi-architecture, exploitation.</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/DOCKER.md" target="_blank" rel="noopener"><b>src/docs/DOCKER.md</b></a><span>L'image autonome : contenu, construction, registre, multi-architecture, lancement, rangement par fichiers, exploitation.</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/PERFORMANCE.md" target="_blank" rel="noopener"><b>src/docs/PERFORMANCE.md</b></a><span>La charge mesurée : scénarios, latences, empreinte mémoire, réglages (<code>UV_THREADPOOL_SIZE</code>, <code>SCRYPT_N</code>).</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/API.md" target="_blank" rel="noopener"><b>src/docs/API.md</b></a><span>La référence de l'API REST du service, engendrée depuis le code : routes, rôles, paramètres, réponses.</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/src/docs/INDUSTRIALISATION.md" target="_blank" rel="noopener"><b>src/docs/INDUSTRIALISATION.md</b></a><span>L'outillage du dépôt : les cinq commandes de vérification, l'intégration continue, et la règle « un fichier, un seul endroit ».</span></li>
             <li><a href="https://github.com/aplds/scribae/blob/main/src/CHANGELOG.md" target="_blank" rel="noopener"><b>src/CHANGELOG.md</b></a><span>Le journal des versions livrées, version par version.</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/README.md" target="_blank" rel="noopener"><b>README.md</b></a><span>À la racine du dépôt : la présentation du logiciel, l'état du projet, et le déploiement Docker.</span></li>
+            <li><a href="https://github.com/aplds/scribae/blob/main/AGENTS.md" target="_blank" rel="noopener"><b>AGENTS.md</b></a><span>Les points d'entrée du dépôt : où vit chaque chose, les commandes, les règles du projet et les pièges — le document par lequel commencer pour travailler sur le code.</span></li>
           </ul>
           <p>La documentation accompagne le logiciel, qui évolue vite : avant d'appliquer une procédure sur une installation de service, vérifier la version en cours et l'entrée datée correspondante du journal des versions.</p>
         </section>
