@@ -1,0 +1,9 @@
+{
+  "_aide": "Bandeau d'annonce, affiché en tête de toutes les pages du site (présentation et documentation). Il se modifie ici même, sur GitHub : cliquer sur le crayon, changer ce qui suit, puis « Commit changes » — le bandeau change pour tous les visiteurs en une minute environ. « actif » doit valoir true pour que le bandeau s'affiche ; false le retire (et la page redevient exactement ce qu'elle était). « titre » s'affiche en gras, « texte » le suit en gris ; l'un ou l'autre peut rester vide. Le bouton n'apparaît que si « lienLibelle » ET « lienUrl » sont tous les deux remplis. Si « fermable » vaut false, la croix disparaît et l'annonce reste visible pour tous. Attention : une virgule oubliée ou un guillemet non fermé empêche le bandeau de s'afficher (la page, elle, reste intacte).",
+  "actif": true,
+  "titre": "Logiciel en cours de développement actif",
+  "texte": "Scribae est en cours de développement actif. Certaines choses sont incomplètes ou non fonctionnelles. N'hésitez pas à faire remonter les problèmes que vous pouvez rencontrer.",
+  "lienLibelle": "Remonter un problème",
+  "lienUrl": "https://github.com/aplds/scribae/issues",
+  "fermable": false
+}
